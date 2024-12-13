@@ -32,6 +32,62 @@ MediAssist is built using the **MIMIC-IV dataset**, a publicly available databas
 
 ---
 
+## Fine-Tuning GPT-4o Model
+
+The MediAssist system incorporates a fine-tuned version of the GPT-4o model to enhance performance for domain-specific tasks, such as summarization, ICD coding, and retrieval-augmented generation (RAG). Below are the steps and details for fine-tuning the model:
+
+### Objectives of Fine-Tuning
+1. **Patient History Summarization**: Improve summarization accuracy using healthcare datasets.
+2. **Medical Coding Automation**: Enhance precision and recall for mapping clinical notes to ICD codes.
+3. **RAG Query Optimization**: Increase relevance and accuracy of responses to clinical queries.
+
+---
+
+### Dataset Preparation
+
+1. **Data Sources**:
+   - MIMIC-IV dataset: Includes discharge summaries, clinical notes, and structured data like ICD codes.
+   - Custom annotated datasets: Paired clinical text with manually assigned ICD codes for training.
+
+2. **Preprocessing**:
+   - Text Standardization: Normalize text fields, including tokenizing medical abbreviations and correcting terminology inconsistencies.
+   - Data Augmentation: Generate synthetic examples using SMOTE and back-translation techniques to balance the dataset.
+
+3. **JSONL Format**:
+   - Training data was prepared in JSONL format, with fields such as `input`, `output`, and `context` to guide fine-tuning.
+   - Example:
+     ```json
+     {
+       "input": "Summarize the following clinical record: [Patient Notes].",
+       "output": "Patient admitted for Type 2 Diabetes Mellitus treatment. Stable vitals upon discharge.",
+       "context": "Summarization task for clinical data."
+     }
+     ```
+
+---
+
+### Fine-Tuning Process
+
+1. **Model Selection**:
+   - **Base Model**: OpenAI GPT-4o pre-trained on diverse datasets with strong general language understanding.
+   - **Task-Specific Fine-Tuning**:
+     - Focused on summarization, coding, and retrieval tasks using MIMIC-IV and additional healthcare datasets.
+
+2. **Training Setup**:
+   - Framework: OpenAI's fine-tuning framework to fine-tune the GPT-4o model.
+   - Hyperparameters:
+     - Learning Rate: `5e-5`
+     - Batch Size: `16`
+     - Epochs: `10`
+
+3. **Evaluation Metrics**:
+   - **Accuracy**: Percentage of correct predictions.
+   - **F1 Score**: Balances precision and recall.
+   - **Precision**: Focus on minimizing false positives.
+   - **Recall**: Captures all relevant cases in predictions.
+
+---
+
 ## Architecture Overview
 
 MediAssist integrates multiple layers for data processing, transformation, and application:
