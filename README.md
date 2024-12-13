@@ -135,12 +135,32 @@ Refer to the documentation for a detailed architecture diagram and component bre
 
 ## Challenges and Solutions
 
-### Key Challenges
-- Missing data and schema inconsistencies in clinical records.
-- Integration complexities with Snowflake and workflow orchestration.
-- High memory demands for large datasets and inference pipelines.
+### Data-Related Challenges
 
-### Solutions
-- Data imputation and domain-specific preprocessing techniques.
-- Modular workflows using Apache Airflow and Dockerized deployments.
-- Efficient data partitioning and Kubernetes-based scaling for model inference.
+1. **Missing Data**:
+   - **Challenge**: Significant missingness in critical fields like `deathtime` and `discharge_location` posed difficulties for analysis and model training.
+   - **Solution**: Null values were imputed using dbt transformations. For example, missing dates were replaced with placeholders like `1900-01-01 00:00:00`, and categorical fields were standardized with `N/A`. Incomplete records were flagged to mitigate potential biases during downstream processing.
+
+2. **High Variability in Clinical Text**:
+   - **Challenge**: Discharge summaries and clinical notes exhibited unstructured formats with inconsistent terminology.
+   - **Solution**: Advanced NLP techniques were employed for preprocessing, including domain-specific tokenizers tailored for medical abbreviations and terminology, ensuring better standardization and model compatibility.
+
+3. **Imbalanced Data for Risk Stratification**:
+   - **Challenge**: High-risk patient cases were underrepresented in the dataset, leading to skewed model predictions.
+   - **Solution**: Data augmentation techniques, such as SMOTE (Synthetic Minority Oversampling), were applied to balance the dataset. Additionally, weighted training processes were introduced to ensure the model focused on underrepresented high-risk cases.
+
+---
+
+### Technical Challenges
+
+1. **Text Parsing Errors**:
+   - **Challenge**: Multiline text fields in the Discharge table caused parsing failures during ETL processes.
+   - **Solution**: Parsing settings were adjusted to handle multiline text efficiently. Validation checks were also added to ensure no critical data was lost during ingestion.
+
+2. **Memory Constraints in Large Tables**:
+   - **Challenge**: Large data volumes, especially from the Pharmacy table, caused memory errors during ingestion.
+   - **Solution**: Data ingestion was optimized by splitting large tables into smaller chunks. Efficient indexing and data partitioning were implemented to reduce memory usage.
+
+3. **Schema Inference Issues**:
+   - **Challenge**: Inconsistent schema inference during Snowpark ingestion led to data type mismatches (e.g., string fields recognized instead of dates).
+   - **Solution**: Schema corrections were manually performed, and dbt transformations ensured consistent data types across tables to eliminate errors.
